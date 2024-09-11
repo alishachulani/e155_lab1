@@ -27,7 +27,7 @@ endmodule
 module led_gates(
 	input clk, reset,
 	input logic [3:0] switch,
-	output logic [2:0 led,
+	output logic [2:0] led
 	);
 		      
   
