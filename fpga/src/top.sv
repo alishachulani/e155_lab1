@@ -3,7 +3,7 @@
 // This projet will test that LEDs on the board are working properly by lighting up under simple and and xor gates
 // It also includes code for a 7-segment display based on the same switches
 
-module test(
+module top(
      input   logic reset,
 	 input	 logic [3:0] switch,
      output  logic [2:0] led,
@@ -11,14 +11,29 @@ module test(
 ); 
 
    logic int_osc;
-   logic [11:0] counter;
+   
   
    // changed this to low frequency oscillator - 10kHz
    LSOSC #() 
          lf_osc (.CLKLFPU(1'b1), .CLKLFEN(1'b1), .CLKLF(int_osc));
+
+	led_gates testing_leds(int_osc, reset, switch, led);
+	sevenseg power_sevenseg(switch, segs); 
+
+endmodule 
+
+
+// module for testing the LEDs by flashing one, XOR the other, and AND the last one  
+module led_gates(
+	input clk, reset,
+	input logic [3:0] switch,
+	output logic [2:0 led,
+	);
+		      
   
    // Counter
-   always_ff @(posedge int_osc) begin
+logic [11:0] counter;
+always_ff @(posedge clk) begin
      if(reset == 0)  counter <= 0;
      else            counter <= counter + 1;
    end
@@ -27,6 +42,14 @@ module test(
    assign led[2] = counter[11];
    assign led[0] = switch[0] ^ switch[1];
    assign led[1] = switch[2] & switch[3];
+
+endmodule
+		
+
+// module for powering the seven segment display 
+module sevenseg( input logic [3:0] switch,
+		output logic [6:0] segs
+		);
    
    // Logic for 7-segment display 
    always_comb begin
@@ -49,10 +72,6 @@ module test(
 			4'b1111: segs = 7'b0111000;
 	   endcase
 	 end 
+endmodule 
 	 
-	  
-
-   
-   
-  
-endmodule
+	
